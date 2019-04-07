@@ -1,0 +1,20 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t rashidmjddocker/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run rashidmjddocker/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t rashidmjddocker/ecommerce-store_client ./client
+  - docker build -t rashidmjddocker/ecommere-store_nginx ./nginx
+  - docker build -t rashidmjddocker/ecommerce-store_server ./server
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push rashidmjddocker/ecommerce-store_client
+  - docker push rashidmjddocker/ecommerce-store_nginx
+  - docker push rashidmjddocker/ecommerce-store_server

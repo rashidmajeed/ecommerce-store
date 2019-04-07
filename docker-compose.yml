@@ -1,0 +1,42 @@
+version: "3"
+services:
+  client:
+    container_name: react-client
+    restart: always
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+    ports:
+      - "3000:3000"
+  nginx:
+    container_name: nginx-dev
+    restart: always
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3050:80"
+    depends_on:
+      - client
+  api:
+    container_name: node-server
+    restart: always
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    depends_on:
+      - mongodb
+    ports:
+      - "5000:5000"
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    ports:
+      - "27017:27017"
+    restart: always
